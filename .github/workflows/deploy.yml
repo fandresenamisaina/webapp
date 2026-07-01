@@ -3,7 +3,7 @@ name: Deploy Website
 on:
   push:
     branches:
-      - master
+      - master   # ou main selon ton repo
 
 permissions:
   contents: read
@@ -16,16 +16,32 @@ concurrency:
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Upload site
+      # (OPTIONNEL) si tu utilises un framework (React, Vue, etc.)
+      # - name: Install dependencies
+      #   run: npm install
+
+      # - name: Build project
+      #   run: npm run build
+
+      # ⚠️ IMPORTANT :
+      # Si ton site est juste HTML/CSS/JS simple → path: .
+      # Sinon mets le dossier de build (ex: dist/ ou build/)
+
+      - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: .   # ou dist / build
 
-      - name: Deploy
+      - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
